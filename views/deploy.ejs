@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="hospital" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">Anwendungen Gesundheitsmarktplatz</h1>
+                            <p class="text-sm text-slate-600">Applikationskatalog</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="/services" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                        <i data-lucide="server" class="w-4 h-4 mr-2"></i>
+                        Meine Services
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="/app/<%= app.id %>" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                Zurück zu <%= app.title %>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Application Info -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-emerald-50 rounded-xl flex items-center justify-center mr-4">
+                        <i data-lucide="<%= app.icon %>" class="w-8 h-8 text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800"><%= app.title %></h1>
+                        <p class="text-slate-600"><%= app.developer %></p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-slate-600 mb-1">Beschreibung</h3>
+                        <p class="text-slate-700"><%= app.description %></p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-slate-600 mb-2">Features</h3>
+                        <div class="space-y-2">
+                            <% app.features.forEach(feature => { %>
+                                <div class="flex items-center">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 mr-2"></i>
+                                    <span class="text-sm text-slate-700"><%= feature %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deployment Configuration -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-slate-800 mb-6">Deployment Konfiguration</h2>
+                
+                <form action="/deploy/<%= app.id %>" method="POST" id="deployForm">
+                    <!-- Configuration based on pricing model -->
+                    <% if (app.pricing.model === 'per_user') { %>
+                        <div class="mb-6">
+                            <label for="users" class="block text-sm font-medium text-slate-700 mb-2">Anzahl Benutzer</label>
+                            <input type="number" id="users" name="users" value="1" min="1" max="1000" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                                   onchange="updatePricing()">
+                        </div>
+                    <% } else if (app.pricing.model === 'usage' || app.pricing.model === 'per_session') { %>
+                        <div class="mb-6">
+                            <label for="estimatedUsage" class="block text-sm font-medium text-slate-700 mb-2">
+                                Geschätzte Nutzung (<%= app.pricing.usageUnit %>)
+                            </label>
+                            <input type="number" id="estimatedUsage" name="estimatedUsage" value="100" min="0" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                                   onchange="updatePricing()">
+                        </div>
+                    <% } %>
+
+                    <!-- Pricing Summary -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Kostenübersicht</h3>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Grundpreis</span>
+                                <span class="font-semibold" id="basePrice"><%= formatPrice(app.pricing.basePrice, app.pricing.currency) %>/<%= app.pricing.period %></span>
+                            </div>
+                            
+                            <% if (app.pricing.usagePrice) { %>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">Nutzungsbasiert</span>
+                                    <span class="font-semibold" id="usagePrice">0 <%= app.pricing.currency %></span>
+                                </div>
+                            <% } %>
+                            
+                            <% if (app.pricing.setupFee > 0) { %>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-600">Einrichtung (einmalig)</span>
+                                    <span class="font-semibold"><%= formatPrice(app.pricing.setupFee, app.pricing.currency) %></span>
+                                </div>
+                            <% } %>
+                            
+                            <hr class="my-3">
+                            
+                            <div class="flex justify-between text-lg">
+                                <span class="font-semibold text-slate-800">Gesamtkosten (monatlich)</span>
+                                <span class="font-bold text-emerald-600" id="totalPrice"><%= formatPrice(app.pricing.basePrice, app.pricing.currency) %></span>
+                            </div>
+                            
+                            <% if (app.pricing.setupFee > 0) { %>
+                                <div class="flex justify-between text-sm text-slate-600">
+                                    <span>Kosten im ersten Monat</span>
+                                    <span id="firstMonthPrice"><%= formatPrice(app.pricing.basePrice + app.pricing.setupFee, app.pricing.currency) %></span>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="mb-6">
+                        <label class="flex items-start">
+                            <input type="checkbox" required class="mt-1 mr-2">
+                            <span class="text-sm text-slate-600">
+                                Ich akzeptiere die <a href="#" class="text-emerald-600 hover:underline">Nutzungsbedingungen</a> 
+                                und <a href="#" class="text-emerald-600 hover:underline">Datenschutzrichtlinien</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Deploy Button -->
+                    <button type="submit" class="w-full px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center justify-center">
+                        <i data-lucide="play" class="w-5 h-5 mr-2"></i>
+                        Service deployen
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const pricing = JSON.stringify(app.pricing);
+        
+        function updatePricing() {
+            let totalMonthly = pricing.basePrice;
+            let usageCost = 0;
+            
+            if (pricing.model === 'per_user') {
+                const users = parseInt(document.getElementById('users').value) || 1;
+                totalMonthly = pricing.basePrice * users;
+                document.getElementById('basePrice').textContent = `${formatPrice(pricing.basePrice)} × ${users} Benutzer`;
+            } else if (pricing.model === 'usage' || pricing.model === 'per_session') {
+                const usage = parseFloat(document.getElementById('estimatedUsage').value) || 0;
+                usageCost = pricing.usagePrice * usage;
+                totalMonthly = pricing.basePrice + usageCost;
+                document.getElementById('usagePrice').textContent = formatPrice(usageCost);
+            }
+            
+            document.getElementById('totalPrice').textContent = formatPrice(totalMonthly);
+            
+            if (pricing.setupFee > 0) {
+                const firstMonth = totalMonthly + pricing.setupFee;
+                document.getElementById('firstMonthPrice').textContent = formatPrice(firstMonth);
+            }
+        }
+        
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: pricing.currency
+            }).format(amount);
+        }
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updatePricing();
+        });
+    </script>
+</body>
+</html>

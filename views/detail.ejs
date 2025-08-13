@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="hospital" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">Anwendungen Gesundheitsmarktplatz</h1>
+                            <p class="text-sm text-slate-600">Applikationskatalog</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="/services" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                        <i data-lucide="server" class="w-4 h-4 mr-2"></i>
+                        Meine Services
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Detail View -->
+        <div class="mb-6">
+            <a href="/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                Zurück zum Katalog
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative">
+                <!-- Header Section -->
+                <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-12">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-6">
+                                <i data-lucide="<%= app.icon %>" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl font-bold text-white mb-2"><%= app.title %></h1>
+                                <p class="text-emerald-100 text-lg"><%= app.developer %></p>
+                            </div>
+                        </div>
+                        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white text-emerald-700">
+                            <%= app.status %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Content Section -->
+                <div class="px-8 py-8">
+                    <!-- Metadata Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-slate-600 mb-1">Version</h3>
+                            <p class="text-lg font-semibold text-slate-800"><%= app.version %></p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-slate-600 mb-1">Kategorie</h3>
+                            <p class="text-lg font-semibold text-slate-800"><%= app.category %></p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-slate-600 mb-1">Status</h3>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border <%= getStatusBadgeClasses(app.status) %>">
+                                <%= app.status %>
+                            </span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h3 class="text-sm font-medium text-slate-600 mb-1">Lizenz</h3>
+                            <p class="text-lg font-semibold text-slate-800"><%= app.license %></p>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Section -->
+                    <div class="bg-emerald-50 rounded-xl p-6 mb-8">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Preisgestaltung</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-3xl font-bold text-emerald-600"><%= getPricingDisplay(app.pricing) %></p>
+                                <% if (app.pricing.setupFee > 0) { %>
+                                    <p class="text-sm text-slate-600 mt-1">Einrichtungsgebühr: <%= formatPrice(app.pricing.setupFee, app.pricing.currency) %></p>
+                                <% } %>
+                            </div>
+                            <button onclick="window.location.href='/deploy/<%= app.id %>'" class="px-8 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center">
+                                <i data-lucide="play" class="w-5 h-5 mr-2"></i>
+                                Jetzt deployen
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Features Section -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Features</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <% app.features.forEach(feature => { %>
+                                <div class="flex items-center">
+                                    <i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3"></i>
+                                    <span class="text-slate-700"><%= feature %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- Description Section -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-slate-800 mb-4">Beschreibung</h2>
+                        <div class="prose prose-slate max-w-none">
+                            <p class="text-slate-700 leading-relaxed text-base"><%= app.description %></p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-4 pt-6 border-t border-gray-200">
+                        <button onclick="window.location.href='/deploy/<%= app.id %>'" class="px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center">
+                            <i data-lucide="play" class="w-5 h-5 mr-2"></i>
+                            Jetzt deployen
+                        </button>
+                        <button class="px-6 py-3 bg-white text-emerald-600 font-medium rounded-lg border border-emerald-200 hover:bg-emerald-50 transition-colors duration-200">
+                            <i data-lucide="mail" class="w-5 h-5 mr-2"></i>
+                            Kontakt aufnehmen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+
+    <%
+    function getStatusBadgeClasses(status) {
+        switch (status) {
+            case 'Verfügbar':
+                return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            case 'Pilot gestartet':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'Planung':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    }
+    %>
+</body>
+</html>

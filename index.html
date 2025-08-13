@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIS Marketplace - Hospital Application Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                        <i data-lucide="hospital" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">KIS Marketplace</h1>
+                        <p class="text-sm text-slate-600">Hospital Application Catalog</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Catalog View -->
+        <div id="catalog-view">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Verfügbare Anwendungen</h2>
+                <p class="text-slate-600">Entdecken Sie die neuesten Softwarelösungen für Ihr Krankenhaus</p>
+            </div>
+            
+            <div id="applications-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Application cards will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div id="detail-view" class="hidden">
+            <div class="mb-6">
+                <button id="back-button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                    Zurück zum Katalog
+                </button>
+            </div>
+            
+            <div id="detail-content" class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- Detail content will be dynamically inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Application data
+        const applications = [
+            {
+                "id": "s3-longterm-storage",
+                "title": "MediSafe S3 Langzeitarchiv",
+                "developer": "SecureHealth IT GmbH",
+                "version": "1.2.5",
+                "category": "Datenspeicherung & Archivierung",
+                "description": "Eine hochsichere und skalierbare Lösung zur langfristigen Archivierung von verschlüsselten medizinischen Daten und Backups. Basiert auf Cold-Storage-Technologie mit S3-kompatiblem Zugriff für maximale Datensicherheit und Compliance.",
+                "status": "Pilot gestartet",
+                "icon": "database"
+            },
+            {
+                "id": "collaboration-platform",
+                "title": "CliniTeam Connect",
+                "developer": "Med-Innovations AG",
+                "version": "2.1.0",
+                "category": "Team-Kollaboration",
+                "description": "Eine integrierte Plattform, die medizinischen Teams Werkzeuge für die Zusammenarbeit zur Verfügung stellt. Umfasst sichere Dateiablage, einen gemeinsamen Kalender und Funktionen zur simultanen Bearbeitung von Dokumenten, um die Effizienz und Kommunikation zu verbessern.",
+                "status": "Pilot gestartet",
+                "icon": "users"
+            },
+            {
+                "id": "secure-messenger",
+                "title": "MediChat Secure",
+                "developer": "Nexus Health Solutions",
+                "version": "3.5.2",
+                "category": "Kommunikation",
+                "description": "Ein DSGVO-konformer Messenger-Dienst, der speziell für das Gesundheitswesen entwickelt wurde. Ermöglicht den schnellen und sicheren Austausch von Nachrichten und Informationen zwischen Ärzten, Pflegepersonal und anderen Klinikakteuren.",
+                "status": "Planung",
+                "icon": "message-square"
+            },
+            {
+                "id": "telekonsil",
+                "title": "TeleDoc Konsil",
+                "developer": "VirtuMed GmbH",
+                "version": "1.8.0",
+                "category": "Telemedizin",
+                "description": "Eine Plattform zur Durchführung von virtuellen Telekonsilen. Ideal für das Einholen von Zweitmeinungen und die Fernbefundung durch Spezialisten, um die Patientenversorgung über geografische Grenzen hinweg zu optimieren.",
+                "status": "Planung",
+                "icon": "video"
+            },
+            {
+                "id": "kis",
+                "title": "KlinikManager Pro",
+                "developer": "CuraSystems",
+                "version": "4.0.1",
+                "category": "Klinikmanagement",
+                "description": "Ein umfassendes Klinikinformationssystem (KIS) zur digitalen Steuerung und Verwaltung aller klinischen und administrativen Prozesse. Unterstützt bei der Behandlungsplanung, Patientendokumentation und der Verwaltung klinischer Daten.",
+                "status": "Verfügbar",
+                "icon": "activity"
+            }
+        ];
+
+        // Utility functions
+        function getStatusBadgeClasses(status) {
+            switch (status) {
+                case 'Verfügbar':
+                    return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                case 'Pilot gestartet':
+                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                case 'Planung':
+                    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                default:
+                    return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
+        }
+
+        function truncateDescription(description, maxLength = 120) {
+            if (description.length <= maxLength) return description;
+            return description.substring(0, maxLength) + '...';
+        }
+
+        // Render functions
+        function renderApplicationCard(app) {
+            return `
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer border border-gray-100 overflow-hidden" onclick="showApplicationDetail('${app.id}')">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="${app.icon}" class="w-6 h-6 text-emerald-600"></i>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeClasses(app.status)}">
+                                ${app.status}
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">${app.title}</h3>
+                        <p class="text-sm text-slate-600 mb-3">${app.developer}</p>
+                        <p class="text-sm text-slate-700 leading-relaxed">${truncateDescription(app.description)}</p>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                <span class="bg-slate-100 px-2 py-1 rounded">${app.category}</span>
+                                <span>v${app.version}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderApplicationDetail(app) {
+            return `
+                <div class="relative">
+                    <!-- Header Section -->
+                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-12">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center">
+                                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-6">
+                                    <i data-lucide="${app.icon}" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl font-bold text-white mb-2">${app.title}</h1>
+                                    <p class="text-emerald-100 text-lg">${app.developer}</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white text-emerald-700">
+                                ${app.status}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Content Section -->
+                    <div class="px-8 py-8">
+                        <!-- Metadata Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="text-sm font-medium text-slate-600 mb-1">Version</h3>
+                                <p class="text-lg font-semibold text-slate-800">${app.version}</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="text-sm font-medium text-slate-600 mb-1">Kategorie</h3>
+                                <p class="text-lg font-semibold text-slate-800">${app.category}</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="text-sm font-medium text-slate-600 mb-1">Status</h3>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadgeClasses(app.status)}">
+                                    ${app.status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="mb-8">
+                            <h2 class="text-xl font-semibold text-slate-800 mb-4">Beschreibung</h2>
+                            <div class="prose prose-slate max-w-none">
+                                <p class="text-slate-700 leading-relaxed text-base">${app.description}</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4 pt-6 border-t border-gray-200">
+                            <button class="px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200">
+                                Weitere Informationen
+                            </button>
+                            <button class="px-6 py-3 bg-white text-emerald-600 font-medium rounded-lg border border-emerald-200 hover:bg-emerald-50 transition-colors duration-200">
+                                Kontakt aufnehmen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Navigation functions
+        function showCatalogView() {
+            document.getElementById('catalog-view').classList.remove('hidden');
+            document.getElementById('detail-view').classList.add('hidden');
+        }
+
+        function showApplicationDetail(appId) {
+            const app = applications.find(a => a.id === appId);
+            if (!app) return;
+
+            document.getElementById('catalog-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+            
+            document.getElementById('detail-content').innerHTML = renderApplicationDetail(app);
+            
+            // Re-initialize Lucide icons for the detail view
+            lucide.createIcons();
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize the application
+        function initializeApp() {
+            // Render application cards
+            const grid = document.getElementById('applications-grid');
+            grid.innerHTML = applications.map(app => renderApplicationCard(app)).join('');
+            
+            // Set up back button
+            document.getElementById('back-button').addEventListener('click', showCatalogView);
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Start the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

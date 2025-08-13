@@ -1,0 +1,28 @@
+/* Custom styles for KIS Marketplace */
+
+/* Additional hover effects and transitions */
+.app-card {
+    transition: all 0.3s ease;
+}
+
+.app-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #10b981;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #059669;
+}

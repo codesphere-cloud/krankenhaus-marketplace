@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="hospital" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">Anwendungen Gesundheitsmarktplatz</h1>
+                            <p class="text-sm text-slate-600">Applikationskatalog</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                        <i data-lucide="store" class="w-4 h-4 mr-2"></i>
+                        Marketplace
+                    </a>
+                    <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
+                        <i data-lucide="server" class="w-4 h-4 mr-2"></i>
+                        Meine Services
+                    </span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Deployed Services</h2>
+            <p class="text-slate-600">Verwalten Sie Ihre aktiven Anwendungen und Services</p>
+        </div>
+
+        <% if (deployedServices.length === 0) { %>
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="server" class="w-12 h-12 text-gray-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-slate-800 mb-2">Keine Services deployed</h3>
+                <p class="text-slate-600 mb-8">Sie haben noch keine Services aus dem Marketplace deployed.</p>
+                <a href="/" class="inline-flex items-center px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors duration-200">
+                    <i data-lucide="store" class="w-5 h-5 mr-2"></i>
+                    Marketplace durchsuchen
+                </a>
+            </div>
+        <% } else { %>
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% deployedServices.forEach(service => { %>
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div class="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center mr-3">
+                                        <i data-lucide="<%= service.appIcon %>" class="w-6 h-6 text-emerald-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-slate-800"><%= service.appTitle %></h3>
+                                        <p class="text-sm text-slate-600"><%= service.developer %></p>
+                                    </div>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    <%= service.status %>
+                                </span>
+                            </div>
+
+                            <!-- Service Info -->
+                            <div class="space-y-3 mb-6">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600">Version:</span>
+                                    <span class="font-medium text-slate-800"><%= service.version %></span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-slate-600">Deployed:</span>
+                                    <span class="font-medium text-slate-800"><%= new Date(service.deployedAt).toLocaleDateString('de-DE') %></span>
+                                </div>
+                                <% if (service.users) { %>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-600">Benutzer:</span>
+                                        <span class="font-medium text-slate-800"><%= service.users %></span>
+                                    </div>
+                                <% } %>
+                                <% if (service.estimatedUsage) { %>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-600">Nutzung:</span>
+                                        <span class="font-medium text-slate-800"><%= service.estimatedUsage %> <%= service.pricing.usageUnit || '' %></span>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Pricing Display -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-slate-600">Monatliche Kosten</span>
+                                    <span class="text-lg font-bold text-emerald-600">
+                                        <% 
+                                        let monthlyCost = service.pricing.basePrice;
+                                        if (service.pricing.model === 'per_user') {
+                                            monthlyCost = service.pricing.basePrice * service.users;
+                                        } else if (service.pricing.model === 'usage' || service.pricing.model === 'per_session') {
+                                            monthlyCost = service.pricing.basePrice + (service.pricing.usagePrice * service.estimatedUsage);
+                                        }
+                                        %>
+                                        <%= formatPrice(monthlyCost, service.pricing.currency) %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <button class="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                                    <i data-lucide="settings" class="w-4 h-4 inline mr-1"></i>
+                                    Verwalten
+                                </button>
+                                <button onclick="removeService('<%= service.id %>')" class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors duration-200">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="mt-12 bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-slate-800 mb-6">Kostenübersicht</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-emerald-600 mb-2">
+                            <%= deployedServices.length %>
+                        </div>
+                        <div class="text-sm text-slate-600">Aktive Services</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-emerald-600 mb-2">
+                            <%
+                            let totalMonthlyCost = 0;
+                            deployedServices.forEach(service => {
+                                let cost = service.pricing.basePrice;
+                                if (service.pricing.model === 'per_user') {
+                                    cost = service.pricing.basePrice * service.users;
+                                } else if (service.pricing.model === 'usage' || service.pricing.model === 'per_session') {
+                                    cost = service.pricing.basePrice + (service.pricing.usagePrice * service.estimatedUsage);
+                                }
+                                totalMonthlyCost += cost;
+                            });
+                            %>
+                            <%= formatPrice(totalMonthlyCost) %>
+                        </div>
+                        <div class="text-sm text-slate-600">Monatliche Gesamtkosten</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-emerald-600 mb-2">
+                            <%= formatPrice(totalMonthlyCost * 12) %>
+                        </div>
+                        <div class="text-sm text-slate-600">Jährliche Kosten</div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </main>
+
+    <script>
+        async function removeService(serviceId) {
+            if (!confirm('Sind Sie sicher, dass Sie diesen Service entfernen möchten?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/services/${serviceId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Fehler beim Entfernen des Services');
+                }
+            } catch (error) {
+                alert('Fehler beim Entfernen des Services');
+            }
+        }
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

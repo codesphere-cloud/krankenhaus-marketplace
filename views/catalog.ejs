@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center hover:opacity-80 transition-opacity">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center mr-4">
+                            <i data-lucide="hospital" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-slate-800">Anwendungen Gesundheitsmarktplatz</h1>
+                            <p class="text-sm text-slate-600">Applikationskatalog</p>
+                        </div>
+                    </a>
+                </div>
+                <nav class="flex items-center space-x-4">
+                    <a href="/services" class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors duration-200">
+                        <i data-lucide="server" class="w-4 h-4 mr-2"></i>
+                        Meine Services
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Catalog View -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Verfügbare Anwendungen</h2>
+            <p class="text-slate-600">Entdecken Sie die neuesten Softwarelösungen für Ihr Krankenhaus</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% applications.forEach(app => { %>
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="<%= app.icon %>" class="w-6 h-6 text-emerald-600"></i>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border <%= getStatusBadgeClasses(app.status) %>">
+                                <%= app.status %>
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2 cursor-pointer hover:text-emerald-600 transition-colors" onclick="window.location.href='/app/<%= app.id %>'">
+                            <%= app.title %>
+                        </h3>
+                        <p class="text-sm text-slate-600 mb-3"><%= app.developer %></p>
+                        <p class="text-sm text-slate-700 leading-relaxed mb-4"><%= truncateDescription(app.description) %></p>
+                        
+                        <!-- Pricing Section -->
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between mb-2 flex-col">
+                                <span class="text-sm font-medium text-slate-600">Preis</span>
+                                <span class="text-lg font-bold text-emerald-600"><%= getPricingDisplay(app.pricing) %></span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                <span><%= app.license %></span>
+                                <% if (app.pricing.setupFee > 0) { %>
+                                    <span>Setup: <%= formatPrice(app.pricing.setupFee, app.pricing.currency) %></span>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2">
+                            <button onclick="window.location.href='/app/<%= app.id %>'" class="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                                Details
+                            </button>
+                            <button onclick="window.location.href='/deploy/<%= app.id %>'" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors duration-200">
+                                <i data-lucide="play" class="w-4 h-4 inline mr-1"></i>
+                                Deploy
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                <span class="bg-slate-100 px-2 py-1 rounded"><%= app.category %></span>
+                                <span>v<%= app.version %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </main>
+
+    <script>
+        // Utility functions
+        function getStatusBadgeClasses(status) {
+            switch (status) {
+                case 'Verfügbar':
+                    return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                case 'Pilot gestartet':
+                    return 'bg-blue-100 text-blue-800 border-blue-200';
+                case 'Planung':
+                    return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                default:
+                    return 'bg-gray-100 text-gray-800 border-gray-200';
+            }
+        }
+
+        function truncateDescription(description, maxLength = 120) {
+            if (description.length <= maxLength) return description;
+            return description.substring(0, maxLength) + '...';
+        }
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+
+    <%
+    function getStatusBadgeClasses(status) {
+        switch (status) {
+            case 'Verfügbar':
+                return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+            case 'Pilot gestartet':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'Planung':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    }
+
+    function truncateDescription(description, maxLength = 120) {
+        if (description.length <= maxLength) return description;
+        return description.substring(0, maxLength) + '...';
+    }
+    %>
+</body>
+</html>
