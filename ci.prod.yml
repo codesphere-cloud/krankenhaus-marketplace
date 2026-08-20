@@ -1,0 +1,24 @@
+schemaVersion: v0.4
+prepare:
+  steps:
+    - command: npm install
+test:
+  steps: []
+run:
+  service:
+    plan: 201
+    replicas: 1
+    network:
+      ports:
+        - port: 3000
+          isPublic: false
+      paths:
+        - port: 3000
+          path: /
+    env: {}
+    volumeMounts:
+      - name: _workspace
+        mountPath: /home/user/app
+        workspacePath: ""
+    steps:
+      - command: npm run start
